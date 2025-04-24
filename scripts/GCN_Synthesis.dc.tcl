@@ -11,7 +11,7 @@ set search_path [list "/usr/local2/ASAP7/afs/asu.edu/class/e/e/e/eee525b/asap7li
 set link_library "* asap7sc7p5t_22b_AO_RVT_TT_170906.db asap7sc7p5t_22b_INVBUF_RVT_TT_170906.db asap7sc7p5t_22b_OA_RVT_TT_170906.db asap7sc7p5t_22b_SEQ_RVT_TT_170906.db asap7sc7p5t_22b_SIMPLE_RVT_TT_170906.db"
 set target_library "asap7sc7p5t_22b_AO_RVT_TT_170906.db asap7sc7p5t_22b_INVBUF_RVT_TT_170906.db asap7sc7p5t_22b_OA_RVT_TT_170906.db asap7sc7p5t_22b_SEQ_RVT_TT_170906.db asap7sc7p5t_22b_SIMPLE_RVT_TT_170906.db"
 
-# #################################CHANGE THIS###################################################
+# #################################USER FILES####################################################
 # TOP_LEVEL_NAME
 set top_level 			"GCN"
 # PATH TO YOUR VERILOG NETLIST
@@ -20,9 +20,14 @@ set netlist_search_path "/home/a22602_asu/asap7_rundir/LAB_Files/LAB4/RTL_Files/
 set netlist_name "GCN.sv"
 # CLOCK PERIOD
 set clk_period 			1000
-# ################################################################################################
+
 # Read filelist comprising all files
-set filelist_path "/home/a22602_asu/asap7_rundir/LAB_Files/LAB4/RTL_Files/filelist.f"
+#set filelist_path "/home/a22602_asu/asap7_rundir/LAB_Files/LAB4/RTL_Files/filelist.f"
+#analyze -format sverilog $filelist_path
+#analyze -f /home/a22602_asu/asap7_rundir/LAB_Files/LAB4/RTL_Files/filelist.f
+
+# Unused, useful for 1 file
+# analyze -format sverilog $netlist_search_path/$netlist_name
 
 # Set a TCL variable with all .sv files in your RTL directory
 set rtl_files [glob /home/a22602_asu/asap7_rundir/LAB_Files/LAB4/RTL_Files/*.sv]
@@ -30,16 +35,19 @@ set rtl_files [glob /home/a22602_asu/asap7_rundir/LAB_Files/LAB4/RTL_Files/*.sv]
 # Analyze all files as SystemVerilog
 analyze -library WORK -format sverilog $rtl_files
 
+# ################################################################################################
 
-# Read systemverilog files
-# analyze -format sverilog $netlist_search_path/$netlist_name
- #analyze -format sverilog $filelist_path
- #analyze -f /home/a22602_asu/asap7_rundir/LAB_Files/LAB4/RTL_Files/filelist.f
+# Standard Commands
 
-
-
+# Reads RTL, and identifies bits of code that represent real hardware structures. They are then converted to generic technology cells.
+# Resolves heirarchy of design, detecting module instances and connections. Assigns the parameter values. Binds modules to their implementations.
+# Most of all -  checks for errors like missing modules or unresolved connections
 elaborate $top_level
+
+# Lists all the designs 
 list_designs
+
+# Sets design as top level
 current_design $top_level
 
 #Create real clock if clock port is found
@@ -54,6 +62,7 @@ if {[sizeof_collection [get_ports clk]] > 0} {
 set_clock_uncertainty 0.01 [get_clocks $clk_name]
 set_clock_transition 0.1 [get_clocks $clk_name]
 
+# Sets how the wire load model uses area. Segmented causes the sum of areas of all designs to be used. (Specifically, all cell areas).
 set_wire_load_mode "segmented" 
 
 set typical_input_delay 0.100
